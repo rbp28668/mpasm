@@ -1,0 +1,19 @@
+# MPLAB IDE generated this makefile for use with Microsoft `nmake'.
+# Project: Barometer.mcp
+# Date: Fri Dec 19 19:33:27 2014
+
+AS = MPASMWIN.exe
+CC = 
+LD = mplink.exe
+AR = mplib.exe
+RM = del
+
+"Barometer.cof" : "barometer.o"
+	$(CC) /p16F88 "16f88_g.lkr" "barometer.o" "C:\Projects\mpasm\BMP085\BMP085.lib" "C:\Projects\mpasm\Math\Math.lib" /z__MPLAB_BUILD=1 /o"Barometer.cof" /M"Barometer.map" /W
+
+"barometer.o" : "barometer.asm" "..\..\..\Program Files (x86)\Microchip\MPASM Suite\p16f88.inc" "..\BMP085\BMP085.inc" "..\lcd\lcd.inc" "..\math\math32.inc"
+	$(AS) /q /p16F88 "barometer.asm" /l"barometer.lst" /e"barometer.err" /o"barometer.o"
+
+"clean" : 
+	$(CC) "barometer.o" "barometer.err" "barometer.lst" "Barometer.cof" "Barometer.hex"
+

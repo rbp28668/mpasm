@@ -1,0 +1,253 @@
+                                PCD8544 Functions
+                                =================
+
+These functions allow controlling the PCD8544 IC that is used as the LCD display
+driver in several Nokia mobile phones.  The code has been written and tested on
+a Nokia 3210 phone display, the 3310 should also be supported.  The LCD has a
+resolution of 84x48 pixels in monochrome and accepts only graphical commands.
+
+There are two sets of functions provided, the first is general purpose access to
+the IC in the LCD and the second provides character based access to the display,
+providing a 16x6 character display.
+
+The first set of functions allow initialising the PIC connections and the LCD IC
+and low level setting of the control pins.  There are also functions to reset
+the display and set the mode (normal or inverse).  The interface to the IC is
+SPI based and a bit-banging method is used (although the SSP port would also
+work).
+
+The second set of functions treat the 84x48 pixel display as a 16x6 character
+display.  Functions are provided to clear the display, set the row and column
+positions and draw characters.
+
+                    ========================================
+
+Prerequisites
+-------------
+
+Before using these functions in your programs the following things must be set
+up.
+
+1) A constant called 'CLOCK' must be defined which is set to the value of the
+   PIC clock (not the instruction cycle clock) measured in Hz.
+
+-------- example code --------
+
+; Set the clock as 4 MHz
+
+CLOCK   EQU     4000000
+
+-------- example code --------
+
+
+2) The following constants must be defined (some are optional):
+
+PCD8544_PORT    - Selects the port containing the SCLK, SDOUT, C_D and SCE bits.
+                  All of the bits must be in the same port.  (Examples: GPIO,
+                  PORTA, PORTB).
+
+PCD8544_TRIS    - Selects the tristate register for the PCD8544_PORT.  (Examples:
+                  TRISIO, TRISA, TRISB).
+
+PCD8544_SDOUT   - The bit to use for the serial SPI output data.  This is the
+                  bit number within the PCD8544_PORT for transmitting data.
+
+PCD8544_SCLK    - The bit to use for the serial clock SPI output.  This is the
+                  bit number within the PCD8544_PORT for sendind the clock.
+
+PCD8544_D_C     - The bit to use for the D_C control pin used to select between
+                  data and command.  This is the bit number within the
+                  PCD8544_PORT for the IC connection.
+
+PCD8544_SCE     - The bit to use for the chip select control pin.  This pin on
+                  the IC must be low to operate, if this constant is not set
+                  then the SCE pin on the IC must be fixed low.
+
+
+-------- example code --------
+
+PCD8544_PORT    EQU  GPIO       ; Required for "pcd8544.inc"
+PCD8544_TRIS    EQU  TRISIO     ; Required for "pcd8544.inc"
+PCD8544_SDOUT   EQU  0          ; Required for "pcd8544.inc"
+PCD8544_SCLK    EQU  1          ; Required for "pcd8544.inc"
+PCD8544_D_C     EQU  2          ; Required for "pcd8544.inc"
+
+-------- example code --------
+
+
+3a) For the main PCD8544 functions two variables called 'pcd8544_temp' and
+    'spi_temp' must be defined which are in the same memory bank as the hardware
+    port defined by PCD8544_PORT.
+
+-------- example code --------
+
+        cblock  0x20
+                pcd8544_temp      ; Required for "pcd8544.inc"
+                spi_temp          ; Required for "pcd8544.inc"
+        endc
+
+-------- example code --------
+
+
+3b) For the character based PCD8544 functions two additional variables called
+    'pcd8544_char_row' and 'pcd8544_char_col' must be defined which are in the
+    same memory bank as the hardware port defined by PCD8544_PORT.
+
+-------- example code --------
+
+        cblock  0x20
+                pcd8544_char_row; Required for "pcd8544_char.inc"
+                pcd8544_char_col; Required for "pcd8544_char.inc"
+        endc
+
+-------- example code --------
+
+
+4a) The file "pcd8544.inc" must be included somewhere in the program (I usually
+    put them at the end of the program just before the 'end').  This must come
+    after the definition of all of the constants.
+
+-------- example code --------
+
+        include "pcd8544.inc"
+
+        end
+
+-------- example code --------
+
+
+4b) For the character based interface the file "pcd8544_char.inc" must also be
+    included somewhere in the program.  This is a large include file so is
+    provided separately.
+
+-------- example code --------
+
+        include "pcd8544_char.inc"
+
+        end
+
+-------- example code --------
+
+
+                    ========================================
+
+Initialisation
+--------------
+
+The PCD8544 port needs to be initialised before it is used.  This is performed
+by calling the PIC hardware initialisation function and the PCD8544
+intialisation function somewhere in the program before using any of the other
+functions.
+
+For the character based functions one additional function 'pcd8544_char_init'
+must be called as well.
+
+-------- example code --------
+
+;; Enable PCD8544 port on PIC
+
+        call    pcd8544_init_port
+
+;; Set PCD8544 device to usable state
+
+        call    pcd8544_init_display
+
+-------- example code --------
+
+
+Clear Screen and Reset Position
+-------------------------------
+
+To clear the screen the 'pcd8544_clear' function should be called (this is
+called automatically by the 'pcd8544_init_display' function anyway).  The clear
+screen function will turn the display blank and then clear the internal memory
+before turning the screen on again.
+
+To reset the momory location so that the next data will be written to the first
+memory location the 'pcd8544_reset_xy' function can be called.
+
+
+Display Modes
+-------------
+
+The display can operate in normal or inverse video modes.  To select one of
+these two modes use the functions 'pcd8544_mode_normal' or
+'pcd8544_mode_inverse'.
+
+
+Low Level Control
+-----------------
+
+Low level control over the control pins of the IC are provided with the
+functions 'pcd8544_chip_enable', 'pcd8544_chip_disable', 'pcd8544_command_mode'
+and 'pcd8544_data_mode'.
+
+The 'pcd8544_chip_enable' and 'pcd8544_chip_disable' functions set the SCE
+control line low or high respectively if the PCD8544_SCE constant is defined.
+
+The 'pcd8544_command_mode' and 'pcd8544_data_mode' functions set the D_C control
+line low or high respectively.
+
+
+Character Based Functions
+-------------------------
+
+The character based functions allow text to be written to the screen in the 16x6
+character grid.  The current position of the next character is available in the
+variables 'pcd8544_char_row' (between 0 and 5 inclusive) and 'pcd8544_char_col'
+(between 0 and 15 inclusive).
+
+To reset the next character position to the top left (0,0) position the
+character initialisation function 'pcd8544_char_init' can be used.
+
+To set the next character to a specific position the 'pcd8544_char_set_row' and
+'pcd8544_char_set_column' functions are used.
+
+-------- example code --------
+
+;; Reset the next character to the top left
+
+        call    pcd8544_char_init
+
+;; Set the next character to the middle of the screen (8,3)
+
+        movlw   8
+        call    pcd8544_char_set_column
+
+        movlw   3
+        call    pcd8544_char_set_row
+
+-------- example code --------
+
+To move the next character position to the beginning of the next line the
+function 'pcd8544_char_newline' can be used or a newline character (0x10) can be
+printed.
+
+To print an ASCII character between 32 and 126 (0x20 and 0x7e) inclusive the
+function 'pcd8544_char_print' is used.  The ASCII character 10 (0x0A) will cause
+the rest of the line to be erased and the next character will be inserted at the
+beginning of the following line.  For characters with a value of 127 (0x7f) or
+above and for other characters below 32 (0x20) a box is drawn.
+
+-------- example code --------
+
+;; Print the string 'Hi!'
+
+        movlw   'H'
+        call    pcd8544_char_print
+        movlw   'i'
+        call    pcd8544_char_print
+        movlw   '!'
+        call    pcd8544_char_print
+
+-------- example code --------
+
+
+                    ========================================
+
+References
+----------
+
+http://serdisplib.sourceforge.net/ser/pcd8544.html
+http://serdisplib.sourceforge.net/ser/doc/pcd8544.pdf
+http://serdisplib.sourceforge.net/ser/doc/goldentek.pdf

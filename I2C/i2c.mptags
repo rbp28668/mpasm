@@ -1,0 +1,26 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+!_TAG_REVISION_NAME	MCHPTags	//
+!_TAG_REVISION_VERSION	6.0.1	//
+DoI2CWrite	C:\Projects\mplab\I2C\i2cslave.asm	177;"	l	line:177
+I2CErr	C:\Projects\mplab\I2C\i2cslave.asm	163;"	l	line:163
+Index	C:\Projects\mplab\I2C\i2cslave.asm	25;"	v	line:25
+Main	C:\Projects\mplab\I2C\i2cslave.asm	46;"	l	line:46
+NODE_ADDR	C:\Projects\mplab\I2C\i2cslave.asm	19;"	d	line:19
+PROG	C:\Projects\mplab\I2C\i2cslave.asm	35;"	l	line:35
+ReadI2C	C:\Projects\mplab\I2C\i2cslave.asm	187;"	l	line:187
+SSP_Handler	C:\Projects\mplab\I2C\i2cslave.asm	113;"	l	line:113
+STARTUP	C:\Projects\mplab\I2C\i2cslave.asm	31;"	l	line:31
+Setup	C:\Projects\mplab\I2C\i2cslave.asm	58;"	l	line:58
+Startup	C:\Projects\mplab\I2C\i2cslave.asm	40;"	l	line:40
+State1	C:\Projects\mplab\I2C\i2cslave.asm	120;"	l	line:120
+State2	C:\Projects\mplab\I2C\i2cslave.asm	130;"	l	line:130
+State3	C:\Projects\mplab\I2C\i2cslave.asm	139;"	l	line:139
+State4	C:\Projects\mplab\I2C\i2cslave.asm	147;"	l	line:147
+State5	C:\Projects\mplab\I2C\i2cslave.asm	155;"	l	line:155
+Temp	C:\Projects\mplab\I2C\i2cslave.asm	26;"	v	line:26
+WriteI2C	C:\Projects\mplab\I2C\i2cslave.asm	172;"	l	line:172

@@ -1,0 +1,128 @@
+                                Delay Functions
+                                ===============
+
+This set of functions provide exact time delays.  These are measured in
+milliseconds, microseconds and instruction cycles depending on which function is
+called.
+
+The functions are written to work for a variety of clock speeds but the
+principle is the same if a different clock speed is used.
+
+
+                    ========================================
+
+Prerequisites
+-------------
+
+Before using these functions in your programs the following things must be set
+up.
+
+1) A constant called 'CLOCK' must be defined which is set to the value of the
+   PIC clock (not the instruction cycle clock) measured in Hz.
+
+-------- example code --------
+
+; Set the clock as 4 MHz
+
+CLOCK   EQU     4000000
+
+-------- example code --------
+
+
+2) A variable called 'delay_temp' must be defined which is in the active memory
+   bank at the time the functions are called.
+
+-------- example code --------
+
+        cblock  0x20
+                delay_temp      ; Required for "delay.inc"
+        endc
+
+-------- example code --------
+
+
+3) The file "delay.inc" must be included somewhere in the program (I usually put
+   them at the end of the program just before the 'end').  This must come after
+   the definition of all of the constants.
+
+-------- example code --------
+
+        include "delay.inc"
+
+        end
+
+-------- example code --------
+
+
+                    ========================================
+
+Millisecond Delays
+------------------
+
+To get a delay of <N> milliseconds use the following code.  Obviously this only
+works for values of <N> between 1 and 255 inclusive.  It is important to note
+that the delay includes the time taken for the execution of these two
+instructions and the return from the function call.
+
+-------- example code --------
+
+; The delay from this point here ...
+
+        movlw   <N>
+        call    delay_ms
+
+; ...  to this point here is exactly <N> milliseconds
+
+-------- example code --------
+
+
+                    ========================================
+
+Microsecond Delays
+------------------
+
+To get a delay of <N> microseconds use the following code.  The maximum delay is
+obviously 255 but the minimum depends on the clock speed, read the file to see
+what it is.  It is important to note that the delay includes the time taken for
+the execution of these two instructions and the return from the function call.
+
+-------- example code --------
+
+; The delay from this point here ...
+
+        movlw   <N>
+        call    delay_us
+
+; ...  to this point here is exactly <N> microseconds
+
+-------- example code --------
+
+
+                    ========================================
+
+Instruction Cycle Delays
+------------------------
+
+These functions do not depend on the clock speed since they are just implemented
+as delays.  There is one function for each even delay length between 4 and 30
+cycles are implemented.  (how to implement odd cycle delays should be obvious
+from looking at the even ones).  The length of the delay again includes the time
+to execute the function call instruction and the return.
+
+-------- example code --------
+
+; The delay from this point here ...
+
+        call    delay_24_cycles
+
+; ...  to this point here is exactly 24 instruction cycles
+
+-------- example code --------
+
+
+                    ========================================
+
+References
+----------
+
+Microchip PIC device programming information.

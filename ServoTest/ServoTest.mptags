@@ -1,0 +1,41 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+!_TAG_REVISION_NAME	MCHPTags	//
+!_TAG_REVISION_VERSION	6.0.1	//
+Borrow	C:\Projects\mplab\ServoTest\ServoTest.asm	217;"	l	line:217
+Centre	C:\Projects\mplab\ServoTest\ServoTest.asm	503;"	l	line:503
+DEBUG_LED	C:\Projects\mplab\ServoTest\ServoTest.asm	25;"	q	line:25
+Debug	C:\Projects\mplab\ServoTest\ServoTest.asm	103;"	l	line:103
+Direct	C:\Projects\mplab\ServoTest\ServoTest.asm	272;"	l	line:272
+Dispatch	C:\Projects\mplab\ServoTest\ServoTest.asm	249;"	l	line:249
+DoneSub	C:\Projects\mplab\ServoTest\ServoTest.asm	218;"	l	line:218
+Fencepost	C:\Projects\mplab\ServoTest\ServoTest.asm	466;"	l	line:466
+HighPos	C:\Projects\mplab\ServoTest\ServoTest.asm	511;"	l	line:511
+Loop	C:\Projects\mplab\ServoTest\ServoTest.asm	200;"	l	line:200
+LowPos	C:\Projects\mplab\ServoTest\ServoTest.asm	495;"	l	line:495
+NotPressed	C:\Projects\mplab\ServoTest\ServoTest.asm	245;"	l	line:245
+RB2	C:\Projects\mplab\ServoTest\ServoTest.asm	21;"	q	line:21
+RB3	C:\Projects\mplab\ServoTest\ServoTest.asm	22;"	q	line:22
+RB4	C:\Projects\mplab\ServoTest\ServoTest.asm	23;"	q	line:23
+RB5	C:\Projects\mplab\ServoTest\ServoTest.asm	24;"	q	line:24
+RESET	C:\Projects\mplab\ServoTest\ServoTest.asm	134;"	l	line:134
+ReadADC	C:\Projects\mplab\ServoTest\ServoTest.asm	95;"	l	line:95
+SERVO_OUT	C:\Projects\mplab\ServoTest\ServoTest.asm	20;"	q	line:20
+SQCount	C:\Projects\mplab\ServoTest\ServoTest.asm	327;"	l	line:327
+SQHigh	C:\Projects\mplab\ServoTest\ServoTest.asm	320;"	l	line:320
+SW1	C:\Projects\mplab\ServoTest\ServoTest.asm	17;"	q	line:17
+Square	C:\Projects\mplab\ServoTest\ServoTest.asm	297;"	l	line:297
+T0Sync	C:\Projects\mplab\ServoTest\ServoTest.asm	66;"	l	line:66
+T1Sync	C:\Projects\mplab\ServoTest\ServoTest.asm	76;"	l	line:76
+T2Sync	C:\Projects\mplab\ServoTest\ServoTest.asm	86;"	l	line:86
+TestADResult	C:\Projects\mplab\ServoTest\ServoTest.asm	117;"	l	line:117
+TriAdd	C:\Projects\mplab\ServoTest\ServoTest.asm	413;"	l	line:413
+TriGoUp	C:\Projects\mplab\ServoTest\ServoTest.asm	452;"	l	line:452
+Triangle	C:\Projects\mplab\ServoTest\ServoTest.asm	369;"	l	line:369
+WaitADC	C:\Projects\mplab\ServoTest\ServoTest.asm	96;"	l	line:96
+debug1	C:\Projects\mplab\ServoTest\ServoTest.asm	107;"	l	line:107
+debug2	C:\Projects\mplab\ServoTest\ServoTest.asm	108;"	l	line:108

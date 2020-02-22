@@ -1,0 +1,159 @@
+                                RS232 Functions
+                                ===============
+
+These functions implement receive and transmit RS232 (8N1 - 8 bits, no parity, 1
+stop bit) functions.  They will operate easily at 57600 baud with a PIC device
+clocked at 4 MHz.  The receive functions optionally implement hardware flow
+control of the RTS line to ensure that the sender knows when it is safe to send
+(removes the need for interrupts in general).  No special hardware is required,
+just 1 input pin for RXD, 1 output pin for TXD and one output pin for RTS
+(optional) all of which must be in the same port.
+
+Various combinations of PIC clock speed and baud rate are provided.
+
+                    ========================================
+
+Prerequisites
+-------------
+
+Before using these functions in your programs the following things must be set
+up.
+
+1) A constant called 'CLOCK' must be defined which is set to the value of the
+   PIC clock (not the instruction cycle clock) measured in Hz.
+
+-------- example code --------
+
+; Set the clock as 4 MHz
+
+CLOCK   EQU     4000000
+
+-------- example code --------
+
+
+2) The following constants must be defined (some are optional):
+
+RS232_BAUD      - Selects the baud rate.  Various speeds are supported but not
+                  all of them and not all baud rates with all clock speeds.
+                  (Examples: 9600, 28800, 57600).
+
+RS232_PORT      - Selects the port containing the RXD/TXD bits.  All of the bits
+                  must be in the same port.  (Examples: GPIO, PORTA, PORTB).
+
+RS232_TRIS      - Selects the tristate register for the RS232_PORT.  (Examples:
+                  TRISIO, TRISA, TRISB).
+
+RS232_TXD       - The bit to use for TX data output.  This is the bit number
+                  within the RS232_PORT for transmitting data. If this is not
+                  defined then no transmit functions will be available but
+                  receiving will still work.
+
+RS232_RXD       - The bit to use for RX data input.  This is the bit number
+                  within the RS232_PORT for receiving data.  If this is not
+                  defined then no receive functions will be available but
+                  transmitting will still work.
+
+RS232_RTS       - The bit to use for RTS data output.  This is the bit number
+                  within the RS232_PORT for the RTS hardware flow control
+                  output.  If this is defined then it will automatically change
+                  state when the PIC is waiting to receive data.
+
+RS232_CTS       - The bit to use for CTS data input.  This is currently unused.
+
+
+-------- example code --------
+
+RS232_BAUD      EQU  9600       ; Required for "rs232.inc"
+RS232_PORT      EQU  GPIO       ; Required for "rs232.inc"
+RS232_TRIS      EQU  TRISIO     ; Required for "rs232.inc"
+RS232_TXD       EQU  2          ; Required for "rs232.inc"
+RS232_RXD       EQU  3          ; Required for "rs232.inc"
+
+-------- example code --------
+
+
+3) A variable called 'rs232_temp' must be defined which is in the same memory
+   bank as the hardware port defined by RS232_PORT.
+
+-------- example code --------
+
+        cblock  0x20
+                rs232_temp      ; Required for "rs232.inc"
+        endc
+
+-------- example code --------
+
+
+4) The file "rs232.inc" must be included somewhere in the program (I usually put
+   them at the end of the program just before the 'end').  This must come after
+   the definition of all of the constants.
+
+-------- example code --------
+
+        include "rs232.inc"
+
+        end
+
+-------- example code --------
+
+
+                    ========================================
+
+Initialisation
+--------------
+
+The RS232 port needs to be initialised before it is used.  This is performed by
+calling the initialisation function somewhere in the program before using any of
+the functions.
+
+-------- example code --------
+
+;; Enable RS232 port
+
+        call    rs232_init_port
+
+-------- example code --------
+
+
+                    ========================================
+
+Transmitting Data
+-----------------
+
+To transmit a byte of data it must first be loaded into the W register and then
+the RS232 transmit function called.
+
+-------- example code --------
+
+;; Transmit the byte of data stored in the variable called 'byte'
+
+        movf    byte,W
+        call    rs232_tx_byte
+
+-------- example code --------
+
+
+                    ========================================
+
+Receiving Data
+--------------
+
+To receive a byte of data the RS232 receive function must be called and the
+result will be returned in the W register.
+
+-------- example code --------
+
+;; Receive a byte and store it in a variable called 'byte'
+
+        call    rs232_rx_byte
+        movwf   byte
+
+-------- example code --------
+
+
+                    ========================================
+
+References
+----------
+
+http://www.easysw.com/~mike/serial/serial.html

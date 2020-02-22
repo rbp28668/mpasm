@@ -1,0 +1,24 @@
+
+SSPIF set
+ in case of overflow 
+ BF set before a receive.
+ falling edge of 9th scl pulse in an address receive (BF set on 8th edge)
+ receive a data byte.
+ at the end of each write.	
+
+Clear BF by reading SSBUF
+Clear overvlow SSPCON,SSPOV in software.
+
+Must write to SSPBUF before releasing CKP
+
+Bits sampled on rising edge of SCL
+
+
+SDA can only change when SCL is low (apart from start when SDA goes low and stop SDA goes high).
+
+~ACK is active low as requires slave to be present to generate properly.  If no acive slave then would float high.
+
+None of the diagrams show SSPIF being set on start or stop.
+
+Note - Current 8031 implementation is probably out of timing (see delays in I2C master)
+

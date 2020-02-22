@@ -1,0 +1,48 @@
+;;--------------------------------------------------------------------------------
+;; $Header: /home/amb/pic/common/RCS/i2c.inc,v 1.4 2010/09/19 09:43:38 amb Exp $
+;;
+;; Main include file for I2C functions.
+;;
+;; Written by Andrew M. Bishop
+;;
+;; This file Copyright 2006, 2010 Andrew M. Bishop
+;; It may be distributed under the GNU Public License, version 2, or
+;; any higher version.  See section COPYING of the GNU Public license
+;; for conditions under which this file may be redistributed.
+;;
+;;--------------------------------------------------------------------------------
+
+;;--------------------------------------------------------------------------------
+;;
+;; Required Variables / Constants for I2C functions
+;;
+;; Constants:   CLOCK           - The PIC clock speed in Hz
+;;              I2C_PORT        - Selects the port containing the SDA/SCL bits
+;;              I2C_TRIS        - Selects the tristate register for the I2C_PORT port
+;;              I2C_SDA         - The bit to use for data (SDA)
+;;              I2C_SCL         - The bit to use for clock (SCL)
+;;
+;; Variables:   i2c_temp        - Stores temporary data, same bank(s) as I2C_PORT and I2C_TRIS
+;;
+;;--------------------------------------------------------------------------------
+
+
+;;
+;; I2C Basic functions
+;;
+
+        include "../common/i2c_basic.inc"
+
+;;
+;; I2C Master functions (bit-banging)
+;;
+
+        include "../common/i2c_master.inc"
+
+;;
+;; I2C Slave functions (bit-banging)
+;;
+
+        include "../common/i2c_slave.inc"
+
+;;--------------------------------------------------------------------------------

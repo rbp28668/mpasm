@@ -1,0 +1,27 @@
+State 1 : Sync  
+	On entry: start timer 1 with sync period
+		expected address = 0
+	RX - discard, restart timer
+	T1 timeout - : ->State 2
+
+State 2 : Wait for address
+	Next expected > limit : ->State 1
+	RX - correct address  : Send byte 1, -> State 3
+	RX - incorrect address : discard byte, -> State 6
+
+State 3 : Wait Send 1
+	End of Transmission : Send byte 2, ->State 4
+
+State 4 : Wait Send 2
+	End of Transmission : Send byte 3, ->State 5
+
+State 5 : Send byte 3
+	End of Transmission : ->State 2
+
+State 6 : Discard: start discard timer
+	RX : discard, ->State 6
+	T1 Timeout : -> State 2
+	
+ST_SYNC	EQU 1
+ST_WT_ADDR EQU 2
+ST_

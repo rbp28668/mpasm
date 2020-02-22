@@ -1,0 +1,245 @@
+                                I2C Functions
+                                =============
+
+There are two sets of I2C functions, one that just uses bit-banging and provides
+a master-only interface and one that uses the SSP port available on some PIC
+devices and provides slave and master interfaces.
+
+The first, simplest, set of functions implement full control over the I2C bus
+with the ability to send start, stop and restart bits as well as transmit and
+receive bytes of data as a master device.  No special hardware is required, just
+1 input/output pin for SDA and 1 input/output pin for SCL both of which must be
+in the same port.
+
+The second, more complicated, set of functions implement both master and slave
+interfaces but require the use of the SSP port to do this.  The master functions
+allow the same operations as the earlier I2C code but they also allow the SSP
+implementation of a slave device to send and receive data.
+
+Both sets of functions are designed to operate with 4 MHz or 8 MHz clocks and
+aim for a 100 kHz I2C bit rate.  If a different speed clock is used then a
+different I2C speed will be seen.
+
+                    ========================================
+
+Prerequisites
+-------------
+
+Before using these functions in your programs the following things must be set
+up.
+
+1) A constant called 'CLOCK' must be defined which is set to the value of the
+   PIC clock (not the instruction cycle clock) measured in Hz.
+
+-------- example code --------
+
+; Set the clock as 4 MHz
+
+CLOCK   EQU     4000000
+
+-------- example code --------
+
+
+2a) For the simple (bit-banging) I2C code the following constants must be
+    defined:
+
+I2C_PORT        - Selects the port containing the SDA and SCL bits.  Both of the
+                  bits must be in the same port.  (Examples: GPIO, PORTA, PORTB).
+
+I2C_TRIS        - Selects the tristate register for the I2C_PORT.  (Examples:
+                  TRISIO, TRISA, TRISB).
+
+I2C_SDA         - The bit to use for data (SDA).  This is the bit number within
+                  the I2C_PORT for data input and output.
+
+I2C_SCL         - The bit to use for clock (SCL).  This is the bit number within
+                  the I2C_PORT for clock output.
+
+-------- example code --------
+
+I2C_PORT        EQU  GPIO       ; Required for "i2c.inc"
+I2C_TRIS        EQU  TRISIO     ; Required for "i2c.inc"
+I2C_SDA         EQU  2          ; Required for "i2c.inc"
+I2C_SCL         EQU  3          ; Required for "i2c.inc"
+
+-------- example code --------
+
+
+2b) For the more complex (SSP port) I2C code most of the constants are
+    automatically defined by the code in the file ssp_hw.inc which uses the type
+    of PIC device to decide.
+
+The variables that are automatically defined are:
+
+SSP_PORT        - Selects the port containing the SSP port.
+SSP_TRIS        - Selects the tristate register for the SSP port.
+SSP_SDA         - The bit to use for SDA data in/out.
+SSP_SCL         - The bit to use for SCL clock in/out.
+
+If the slave operation is required then the address to use must be set.
+
+SSP_I2C_ADDRESS - The address to use for the slave address.  Any 7 bit value,
+                  bits 1 to 7 are important and bit 0 must be zero.
+
+
+3) A variable called 'i2c_temp' must be defined which is accessible from the
+   same memory bank(s) as the port control defined by I2C_PORT or SSP_PORT and
+   the port tri-state control defined by I2C_TRIS or SSP_TRIS.  The specific
+   address will depend on the type of PIC device being used.
+
+-------- example code --------
+
+        cblock  0x20             ; Shared between banks for 12F675
+                i2c_temp         ; Required for "i2c.inc"
+        endc
+
+-------- example code --------
+
+
+4a) For the simple (bit-banging) I2C code the file "i2c.inc" must be included
+    somewhere in the program (I usually put them at the end of the program just
+    before the 'end').  This must come after the definition of all of the
+    constants.
+
+-------- example code --------
+
+        include "i2c.inc"
+
+        end
+
+-------- example code --------
+
+
+4b) For the more complex (SSP port) I2C code the file "i2c_ssp.inc" must be
+    included somewhere in the program (I usually put them at the end of the
+    program just before the 'end').  This must come after the definition of all
+    of the constants.
+
+-------- example code --------
+
+        include "i2c_ssp.inc"
+
+        end
+
+-------- example code --------
+
+
+                    ========================================
+
+Initialisation
+--------------
+
+The I2C port needs to be initialised before it is used.  This is performed by
+calling the initialisation function somewhere in the program before using any of
+the functions.
+
+For the simple (bit-banging) I2C functions the name is 'i2c_init_port', for the
+more complex (SSP port) functions the name is 'i2c_ssp_init_port'.
+
+-------- example code --------
+
+;; Enable I2C port
+
+        call    i2c_init_port
+
+-------- example code --------
+
+
+                    ========================================
+
+Master Operation
+----------------
+
+To operate as a master device the full set of start, stop, restart and data
+bytes must be transmitted.  The functions don't do everything for you
+automatically so some understanding of the I2C format is needed.  See the list
+of references at the end of the file for details.
+
+The set of functions to read two bytes from addresses 0x30 and 0x31 in an I2C
+EEPROM that has the I2C address of 0xA0 is shown in the following example for
+the simple (bit-banging) functions.
+
+-------- example code --------
+
+        call    i2c_master_tx_start ; I2C Start
+
+        movlw   0xA0
+        call    i2c_master_tx_byte ; transmit EEPROM write address
+
+        movlw   0
+        call    i2c_master_tx_byte ; transmit address MSB (0)
+
+        movlw   0x30
+        call    i2c_master_tx_byte ; transmit address LSB (0x30)
+
+        call    i2c_master_tx_restart ; I2C restart
+
+        movlw   0xA1
+        call    i2c_master_tx_byte ; transmit EEPROM read address
+
+        call    i2c_master_rx_byte ; receive data byte, send ACK
+        movwf   byte1              ; store result in variable called 'byte1'
+
+        call    i2c_master_rx_last_byte ; receive last data byte, send NACK
+        movwf   byte2              ; store result in variable called 'byte2'
+
+        call    i2c_master_tx_stop ; I2C Stop
+
+-------- example code --------
+
+For the more complex (SSP port) functions the command names that would be used
+are:
+
+i2c_ssp_master_tx_start
+i2c_ssp_master_tx_restart
+i2c_ssp_master_tx_stop
+i2c_ssp_master_tx_byte
+i2c_ssp_master_rx_byte
+i2c_ssp_master_rx_last_byte
+
+There is no error checking shown in the example code, but the value of the ACK
+or NACK from the transmission of a byte is stored in the W register.  Read the
+files to see more details.
+
+
+                    ========================================
+
+Slave Operation
+---------------
+
+The slave mode of operation is only available with the more complex (SSP port)
+version of the code.
+
+The code for the slave is simpler because there is no need to worry about the
+start, stop and restart bits because the SSP handles them (the restart is a stop
+followed by a start).
+
+The example code below shows the slave receiving 2 bytes of data after correctly
+matching the address.
+
+-------- example code --------
+
+        call    i2c_ssp_slave_rx_address ; Wait for correct address to match
+        movwf   address         ; store matched address in variable 'address'
+
+        call    i2c_ssp_slave_rx_byte ; Receive a byte and send ACK
+        movwf   byte1           ; store result in variable called 'byte1'
+
+        call    i2c_ssp_slave_rx_last_byte ; Receive a last byte, send NACK
+        movwf   byte2           ; store result in variable called 'byte2'
+
+-------- example code --------
+
+
+                    ========================================
+
+References
+----------
+
+Microchip App Note 578 - 00578b.pdf
+Microchip App Note 734 - 00734a.pdf
+Microchip App Note 554 - 00554c.pdf
+
+Microchip document i2c.pdf
+
+PICmicro Mid-Range MCU Family Reference Manual chapter 15 - 31015a.pdf

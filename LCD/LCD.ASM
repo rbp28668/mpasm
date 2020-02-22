@@ -1,0 +1,142 @@
+;
+; Test program for standard 2 line by 16 char LCD display in 4-bit mode.
+;
+	LIST P=16F818
+#include p16f818.inc
+		__CONFIG _BODEN_ON & _CP_OFF & _PWRTE_ON & _WDT_OFF & _LVP_OFF & _INTRC_IO
+
+
+;=======================================================
+; Constants
+; Note - these need to be set to configure the hardware configuration
+; of the PIC driving the LCD.
+;=======================================================
+
+_ClkIn			EQU		D'8000000'		; Processor clock frequency.
+
+
+LCD_DATA         EQU     PORTA          ; Uses LS 3 bits of port - update 
+LCD_DATA_TRIS    EQU     TRISA
+LCD_CNTL         EQU     PORTB
+LCD_DATA_MASK	 EQU	 0x0F			; which bits of the port are used for data bits
+
+; LCD Display Commands and Control Signal names on PORTB
+E				EQU		5				; LCD Enable control line
+RW				EQU		3				; LCD Read/Write control line
+RS				EQU		0				; LCD Register Select control line
+;
+           include lcd.inc
+
+
+       		code     0                 ; RESET vector location
+RESET       GOTO    START              ;
+;
+; This is the Periperal Interrupt routine. Should NOT get here
+;
+isr        	code     4              ; Interrupt vector location
+			retfie
+
+;
+START                               ; POWER_ON Reset (Beginning of program)
+            CLRF    STATUS          ; Do initialization (Bank 0)
+            CLRF    INTCON
+            CLRF    PIR1
+
+			banksel OSCCON
+			MOVLW	B'01110000'		; Set 8MHz internal clock (01110000 for 8MHz)
+			MOVWF	OSCCON
+
+            BSF     STATUS, RP0     ; Bank 1
+            MOVLW   0x00            ; The LCD module does not like to work w/ weak pull-ups
+            MOVWF   OPTION_REG      ;
+            CLRF    PIE1            ; Disable all peripheral interrupts
+            MOVLW   0xFF            ;
+            MOVWF   ADCON1          ; Port A is Digital.
+;
+;
+            BCF     STATUS, RP0     ; Bank 0
+            CLRF    PORTA           ; ALL PORT output should output Low.
+            CLRF    PORTB
+            BCF     T1CON, TMR1ON   ; Timer 1 is NOT incrementing
+;
+            BSF     STATUS, RP0     ; Select Bank 1
+            CLRF    TRISA           ; RA5 -  0 outputs
+            MOVLW   B'11010010'     ; Bits 0, 3 and 5 outputs for controls.
+            MOVWF   TRISB           ; RB7 - 4 inputs, RB3 - 0 outputs 
+            BCF     STATUS, RP0     ; Select Bank 0
+
+            bcf     PORTB,2          ; ground contrast signal.
+
+            movlw   0               ; all of port A to be output
+			CALL	LCD_INIT
+
+
+;
+    page
+;
+
+            movlw   CLR_DISP
+            call    SEND_CMD
+
+            movlw   DISP_ON_B
+            call    SEND_CMD
+
+            movlw   DD_RAM_UL
+            call    SEND_CMD
+
+;Send a message the hard way
+            movlw   'M'
+            call    SEND_CHAR
+            movlw   'i'
+            call    SEND_CHAR
+            movlw   'c'
+            call    SEND_CHAR
+            movlw   'r'
+            call    SEND_CHAR
+            movlw   'o'
+            call    SEND_CHAR
+            movlw   'c'
+            call    SEND_CHAR
+            movlw   'h'
+            call    SEND_CHAR
+            movlw   'i'
+            call    SEND_CHAR
+            movlw   'p'
+            call    SEND_CHAR
+
+
+            movlw   DD_RAM_ADDR + 0x40     ;Address DDRam first character, second line
+            call    SEND_CMD
+
+            movlw   'H'
+            call    SEND_CHAR
+            movlw   'e'
+            call    SEND_CHAR
+            movlw   'l'
+            call    SEND_CHAR
+            movlw   'l'
+            call    SEND_CHAR
+            movlw   'o'
+            call    SEND_CHAR
+            movlw   ' '
+            call    SEND_CHAR
+            movlw   'W'
+            call    SEND_CHAR
+            movlw   'o'
+            call    SEND_CHAR
+            movlw   'r'
+            call    SEND_CHAR
+            movlw   'l'
+            call    SEND_CHAR
+            movlw   'd'
+            call    SEND_CHAR
+
+	        
+            bsf     PORTA, 4        ; light LED.
+            goto    $ ; stop.
+
+    end
+
+
+
+

@@ -1,0 +1,119 @@
+                                     Macros
+                                     ======
+
+These macros perform various useful functions.
+
+
+                    ========================================
+
+Interrupt Macro
+---------------
+
+The interrupt macro performs the push and pop functions that store the current
+value of the 'w' register and the 'STATUS' register.  This is very useful in
+interrupt handling (among other things).
+
+This code is based on the code in the Microchip User Manual (DS31008A).
+
+
+Prerequisites
+- - - - - - -
+
+Before using these macros in your programs the following things must be set up.
+
+
+1) A variable called 'int_temp_w' must be defined which is available in all
+   memory banks or at least in the bank from which INT_PUSH is called.  A
+   variable called 'int_temp_status' must be defined which is accessible from
+   bank 0.
+
+-------- example code --------
+
+        cblock  0x70
+                int_temp_w      ; Required by "int_macro.inc"
+                int_temp_status ; Required by "int_macro.inc"
+        endc
+
+-------- example code --------
+
+
+2) The file "int_macro.inc" must be included somewhere in the program before the
+   macros are used (I usually put them at the top of the program just before the
+   'org').
+
+-------- example code --------
+
+        include "int_macro.inc"
+
+        org     0x00
+
+-------- example code --------
+
+
+Usage
+- - -
+
+To use the macros 'INT_PUSH' must be called at the start of the interrupt
+handler and 'INT_POP' must be called at the end.  Any operations performed
+between 'INT_PUSH' and 'INT_POP' will not corrupt the current state of the
+program execution (the 'w' and 'STATUS' registers).
+
+-------- example code --------
+
+        ;; Save state
+
+        INT_PUSH
+
+        ;; Handle interrupt - increment a 2 byte counter
+
+        incfsz  counter_lsb,F
+        goto    $+2
+        incf    counter_msb,F
+
+        ;; Restore state
+
+        INT_POP
+
+-------- example code --------
+
+
+                    ========================================
+
+Switch Macro
+------------
+
+The switch macro gets its name from the C language 'switch' keyword.  It isn't
+quite as flexible as the C 'switch' statement and is more of a computed 'goto'
+where execution jumps to one of a number of lines depending on the value of a
+variable.
+
+This code is the most complete version described in Microchip App note 556 and
+can be used at any memory location (see App note for simpler, restricted,
+versions).
+
+
+Usage
+- - -
+
+The 'SWITCH' macro takes one parameter which is the name of a variable that
+contains the value to use.  In this example the variable 'day' contains a number
+corresponding to a day of the week (1-7) or zero as an error case.  The example
+code jumps to one of 8 different locations depending on the value of this
+variable.
+
+-------- example code --------
+
+        movlw   0x07
+        andwf   day,F
+
+        SWITCH  day
+        goto    day_end         ; case 0 (invalid value)
+        goto    day_sunday      ; case 1
+        goto    day_monday      ; case 2
+        goto    day_tuesday     ; case 3
+        goto    day_wednesday   ; case 4
+        goto    day_thursday    ; case 5
+        goto    day_friday      ; case 6
+        goto    day_saturday    ; case 7
+
+-------- example code --------

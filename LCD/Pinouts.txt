@@ -1,0 +1,70 @@
+0.8V, 120mA
+
+6.7R
+
+
+4-bit operation
+Transfers high nibble first.
+
+
+RA0 - LCD: D4
+RA1 - LCD: D5
+RA2 - LCD: D5
+RA3 - LCD: D7
+RA4 - 
+RA5 - ICSP: ~MCLR/VPP
+RA6 - 
+RA7 -
+
+
+
+
+RB0 - LCD: RS
+RB1 - I2C: SDA
+RB2 - LCD: CCP1-PWM for contrast
+RB3 - LCD: RW
+RB4 - I2C: SCL
+RB5 - LDC: E
+RB6 - ICSP: PGC
+RB7 - ICSP: PGD
+
+
+
+
+
+
+
+LCD
+D7	RA7 (16)
+D6	RA6 (15)
+D5	RB3 (9)
+D4	RA4 (3)
+D3	RA3 (2)
+D2	RA2 (1)
+D1	RA1 (18)
+D0	RA0 (17)
+RS	RB5 (11)
+E	RB0 (6)
+R/W	RB2 (8)
+
+
+ICSP
+PGD (13)
+PGC (12)
+Vpp (4)
+
+
+
+I2C
+SDA (7)
+SCL (10)
+
+Note PGM only used in low voltage programming mode.
+
+ICSP header:
+VPP - 1
+VDD - 2
+Gnd - 3
+ICSPDat - 4 (PGD)
+ICSPCLK - 5 (PGC)
+AUX - 6 (n/c)

@@ -1,0 +1,204 @@
+                                SPI Functions
+                                =============
+
+The SPI functions again use the SSP port on the PIC device and allow for
+initialising the port and sending and receiving bytes of data.  These are quite
+simple functions since all of the work is done by the SSP port.
+
+                    ========================================
+
+Prerequisites
+-------------
+
+Before using these functions in your programs the following things must be set
+up.
+
+1) A constant called 'CLOCK' must be defined which is set to the value of the
+   PIC clock (not the instruction cycle clock) measured in Hz.
+
+-------- example code --------
+
+; Set the clock as 4 MHz
+
+CLOCK   EQU     4000000
+
+-------- example code --------
+
+
+2a) The constants for the SSP port hardware must be configured.  These are
+    automatically defined by the code in the file ssp_hw.inc which uses the type
+    of PIC device to decide.
+
+The variables that are automatically defined are:
+
+SSP_PORT        - Selects the port containing the SSP port.
+SSP_TRIS        - Selects the tristate register for the SSP port.
+SSP_SDI         - The bit to use for SDI data input.
+SSP_SDO         - The bit to use for SDO data output.
+SSP_SS          - The bit to use for SS chip select.
+SSP_SCK         - The bit to use for SC data clock.
+
+
+2b) The constants for the operational configuration of the SSP port hardware
+must be configured.
+
+SPI_CKE         - Selects the clock edge to transmit data on.  This is used
+                  directly to set the value of the CKE bit in the SSPSTAT
+                  register of the SSP port.
+
+SPI_CKP         - Selects the clock idle state.  This is used directly to set
+                  the value of the CKP bit in the SSPSTAT register of the SSP
+                  port.
+
+SPI_SMP         - Selects the point to sample the data.  This is used directly
+                  to set the value of the SMP bit in the SSPSTAT register of the
+                  SSP port.
+
+SPI_RATE_DIV    - Selects the SPI port rate divide ratio.  This is the ratio by
+                  which the PIC internal clock is divided by the SSP port,
+                  values of 4, 16 or 64 are allowed.
+
+SPI_SDI_INV     - Specifies if the SDI port is inverted.  If you don't define
+                  this then it will not be inverted.  It was useful to have this
+                  at one time.
+
+
+3) A variable called 'spi_temp' must be defined which is in the same memory
+   bank as the SSP memory location SSPBUF.
+
+-------- example code --------
+
+        cblock  0x20
+                spi_temp         ; Required for "spi.inc"
+        endc
+
+-------- example code --------
+
+
+4) The file "spi.inc" must be included somewhere in the program (I usually put
+   them at the end of the program just before the 'end').  This must come after
+   the definition of all of the constants.
+
+-------- example code --------
+
+        include "spi.inc"
+
+        end
+
+-------- example code --------
+
+
+                    ========================================
+
+Initialisation
+--------------
+
+To initialise the SPI port for master operation (the only one supported by these
+functions) the initialisation function must be called.
+
+-------- example code --------
+
+;; Enable SPI port
+
+        call    spi_init_master_port
+
+-------- example code --------
+
+
+                    ========================================
+
+Enable / Disable Chip Select
+----------------------------
+
+The chip select output of the SSP port can be enabled or disabled by these two functions.
+
+-------- example code --------
+
+;; Enable chip select (active low)
+
+        call    spi_enable_chip_select
+
+;; Disable chip select (inactive high)
+
+        call    spi_disable_chip_select
+
+-------- example code --------
+
+
+                    ========================================
+
+Send / Receive / Wait for Data
+------------------------------
+
+Because of the way that SPI works there will always be a byte of data received
+for each byte of data transmitted.  In some case the transmitted byte is
+important and the received byte can be discarded and in some cases the received
+byte is important and the transmitted data can be anything.  Sometimes the data
+must be transmitted before the next operation and sometimes things can happen in
+parallel.  There are functions to handle all of the these options.
+
+The general procedure is:
+
+ +--------+
+ |        |
+ |        v
+ |      Step 1    Transmit a byte (insert into SSP)
+ |        |
+ |        v
+ |      Step 2    Wait for it to be transmitted
+ |        |
+ |        v
+ |      Step 3    Receive a byte (extract from SSP)
+ |        |
+ |        v
+ +--------+
+
+The function that performs steps 1, 2 and 3 is called 'spi_tx_wait_rx_byte' and
+transmits the value of the W register and stores the received result in the W
+register.
+
+-------- example code --------
+
+        movf    byte_tx,W       ; transmit the value in the variable 'tx_byte'.
+
+        call    spi_tx_wait_rx_byte
+
+        movwf   byte_rx         ; store received value in variable 'rx_byte'
+
+-------- example code --------
+
+
+There is a function that performs just step 1 (transmitting a byte) called
+'spi_tx_byte'.  This will not wait for a byte to be received so other things can
+be done while it is being transmitted.
+
+The function to perform just step 2 (waiting for the byte to be transmitted) is
+called 'spi_wait_byte'.
+
+The function to perform just step 3 (receiving a byte) is called 'spi_rx_byte'.
+This will not wait for the byte to be received so some other function or method
+must be used for that.
+
+There is a function for steps 1 and 2 called 'spi_tx_wait_byte'.
+
+There is a function for steps 2 and 3 called 'spi_wait_rx_byte'.
+
+There is a function for steps 3 and 1 called 'spi_rx_tx_byte'.  This will
+receive the previous byte and transmit the next one as soon as possible.
+
+To receive a byte without specifying one to be transmitted (steps 1, 2 and 3
+with dummy data for step 1) the function is 'spi_dummy_wait_rx_byte'.
+
+To transmit a byte and ignoring the received one (steps 1, 2 and 3 but
+discarding the value of the data for step 3) the function is
+'spi_tx_wait_discard_byte'.
+
+
+                    ========================================
+
+References
+----------
+
+Microchip document spi.pdf
+
+PICmicro Mid-Range MCU Family Reference Manual chapter 15 - 31015a.pdf

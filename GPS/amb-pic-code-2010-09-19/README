@@ -1,0 +1,62 @@
+                                   PIC CODE
+                                   ========
+
+Microchip PIC Assembler functions
+
+                    ========================================
+
+Code Description
+----------------
+
+What I have written is intended to be easy to read with comments, ASCII art
+diagrams of waveforms and instruction counts.  I wanted something that would be
+easy to understand when I re-read it again months later.  This also means that
+it is split across a number of include files.  It is written to be easy to use
+which means that it isn't as fast as it could be in some places.  Most of the
+code is not written with particular regard to optimising speed or reducing code
+size.  Where one is preferred over the other it is normally speed that beats
+instruction count.  Minimising the number of temporary variables is important
+too though.
+
+I have avoided the use of interrupts as well which means for example that the
+RS232 code waits for incoming data and doesn't use an interrupt to start
+capturing it.  There are also no macros so that everything is implemented as
+functions.  The configuration of the options (like pins to use, PIC device
+clock, baud rate) are controlled by constants that need to be defined before the
+file is included.
+
+                    ========================================
+
+Copyright
+---------
+
+These assembler functions are copyrighted by me - Andrew M. Bishop. They are not
+public domain which would allow you to do anything that you like with them. You
+can copy them only if you follow the terms of the license which I have applied
+to them.
+
+License
+-------
+
+This software is covered by the Gnu General Public License (Version 2). The full
+text of the GPL v2 as applied to this software is available in the file called
+COPYING that is available in this directory.
+
+Warranty
+--------
+
+THERE IS NO WARRANTY WITH THIS SOFTWARE.
+
+This is only software, it cannot check the electrical connections to the PIC
+device or the properties of the components that you connect to it.  Using this
+software is not a substitute for knowing what you are doing electrically.
+
+These functions all worked for me on the PIC devices that I used when I wrote
+them.  They may not work for you because you use a different compiler, or a
+different PIC device, or a different clock speed.
+
+                    ========================================
+
+Original Source: http://www.gedanken.demon.co.uk/amb-pic-code/
+
+Andrew M. Bishop - May 2008.

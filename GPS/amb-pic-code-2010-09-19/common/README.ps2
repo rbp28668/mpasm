@@ -1,0 +1,210 @@
+                                PS/2 Functions
+                                ==============
+
+These PS/2 functions implement both the "host" and "device" ends of the PS/2
+mouse and keyboard serial protocol as well as a monitor function.  The PS/2
+protocol is similar to RS232 in that the data is sent serially, LSB first with a
+start bit, parity bit and stop bit.  The "host" end of the link is always in
+control but the clock comes from the "device".
+
+
+                    ========================================
+
+Prerequisites
+-------------
+
+Before using these functions in your programs the following things must be set
+up.
+
+1) A constant called 'CLOCK' must be defined which is set to the value of the
+   PIC clock (not the instruction cycle clock) measured in Hz.
+
+-------- example code --------
+
+; Set the clock as 4 MHz
+
+CLOCK   EQU     4000000
+
+-------- example code --------
+
+
+2) The following constants must be defined (some are optional):
+
+PS2_PORT        - Selects the port containing the DATA/CLOCK bits.  Both of the
+                  bits must be in the same port.  (Examples: GPIO, PORTA, PORTB).
+
+PS2_TRIS        - Selects the tristate register for the PS2_PORT.  (Examples:
+                  TRISIO, TRISA, TRISB).
+
+PS2_DATA        - The bit to use for data input and output.  This is the bit
+                  number within the PS2_PORT.
+
+PS2_CLOCK       - The bit to use for clock input or output.  This is the bit
+                  number within the PS2_PORT.
+
+
+-------- example code --------
+
+PS2_PORT        EQU  GPIO       ; Required for "ps2.inc"
+PS2_TRIS        EQU  TRISIO     ; Required for "ps2.inc"
+PS2_DATA        EQU  4          ; Required for "ps2.inc"
+PS2_CLOCK       EQU  5          ; Required for "ps2.inc"
+
+-------- example code --------
+
+
+3) A temporary variable called 'ps2_temp' must be defined as well as two
+   variables called 'ps2_status' and 'ps2_data' which must all be in the same
+   memory bank as the hardware port defined by PS2_PORT.
+
+-------- example code --------
+
+        cblock  0x20
+                ps2_data        ; Required for "ps2.inc"
+                ps2_status      ; Required for "ps2.inc"
+                ps2_temp        ; Required for "ps2.inc"
+        endc
+
+-------- example code --------
+
+
+4) The file "ps2.inc" must be included somewhere in the program (I usually put
+   them at the end of the program just before the 'end').  This must come after
+   the definition of all of the constants.
+
+-------- example code --------
+
+        include "ps2.inc"
+
+        end
+
+-------- example code --------
+
+
+                    ========================================
+
+Initialisation
+--------------
+
+The PS/2 port needs to be initialised before it is used.  This is performed by
+calling the initialisation function somewhere in the program before using any of
+the functions.
+
+-------- example code --------
+
+;; Enable PS/2 port
+
+        call    ps2_init_port
+
+-------- example code --------
+
+
+                    ========================================
+
+Monitor Functions
+-----------------
+
+To monitor a PS/2 bus means to watch the communications between a "device" and a
+"host" and to capture the data that is being sent as well as work out which
+direction the data is being sent.  There is a single function that will monitor
+a PS/2 bus and return the data byte and the type of communication.
+
+-------- example code --------
+
+;; Monitor PS/2 port
+
+        call    ps2_monitor_byte
+
+-------- example code --------
+
+The data that is captured by this function is stored in the 'ps2_data' variable
+and the type of communication is in the 'ps2_status' variable.  The bits within
+the 'ps2_status' variable indicate the direction of transfer, the parity status
+and if the transmission was interrupted or completed normally.  (See the code
+for the meaning of the bits).
+
+
+                    ========================================
+
+Host Functions
+--------------
+
+To operate as a host means being operating like the computer in a normal
+keyboard or mouse to computer situation.  The data can be sent in either
+direction on the link so there are functions to transmit and to receive data.
+
+To transmit a byte from the host to the device the function to use is
+'ps2_host_tx_byte'.
+
+-------- example code --------
+
+;; Transmit a byte from host to device
+
+        movf    byte,W         ; transmit contents of variable 'byte'.
+        call    ps2_host_tx_byte
+
+-------- example code --------
+
+To receive a byte in the host from the device the function to use is
+'ps2_host_rx_byte'.
+
+-------- example code --------
+
+;; Receive a byte from device to host
+
+        call    ps2_host_rx_byte
+        movf    ps2_data,W
+        movwf   byte           ; store received contents in variable 'byte'.
+
+-------- example code --------
+
+Obviously there is a lot of error checking missing from these examples and
+knowing when and what to transmit or receive is important to these links.
+
+
+                    ========================================
+
+Device Functions
+----------------
+
+To operate as a device means being operating like the mouse or keyboard in a
+normal keyboard or mouse to computer situation.  The data can be sent in either
+direction on the link so there are functions to transmit and to receive data.
+
+To transmit a byte from the device to the host the function to use is
+'ps2_device_tx_byte'.
+
+-------- example code --------
+
+;; Transmit a byte from device to host
+
+        movf    byte,W         ; transmit contents of variable 'byte'.
+        call    ps2_device_tx_byte
+
+-------- example code --------
+
+To receive a byte in the device from the host the function to use is
+'ps2_device_rx_byte'.
+
+-------- example code --------
+
+;; Receive a byte from host to device
+
+        call    ps2_device_rx_byte
+        movf    ps2_data,W
+        movwf   byte           ; store received contents in variable 'byte'.
+
+-------- example code --------
+
+Obviously there is a lot of error checking missing from these examples and
+knowing when and what to transmit or receive is important to these links.
+
+
+                    ========================================
+
+References
+----------
+
+http://www.computer-engineering.org/ps2protocol/
+http://www.computer-engineering.org/ps2keyboard/
+http://www.computer-engineering.org/ps2mouse/

@@ -1,0 +1,246 @@
+                                Infra-Red Functions
+                                ===================
+
+These functions implement receive and transmit in various Infra-Red remote
+control formats.
+
+The transmit side is performed using an Infra-Red LED with a wavelength matched
+to the device being controlled (normally 940 nm).  The output is active high but
+a PIC device is unable to provide very high currents so a transistor switch
+should proably be used.  A carrier frequency of approx 38 kHz (26 us period) is
+used.
+
+The receive side requires the use of a device that can perform carrier recovery
+on the transmitted signal, I used a TSOP1738 device.
+
+
+                    ========================================
+
+Prerequisites
+-------------
+
+Before using these functions in your programs the following things must be set
+up.
+
+1) A constant called 'CLOCK' must be defined which is set to the value of the
+   PIC clock (not the instruction cycle clock) measured in Hz.
+
+-------- example code --------
+
+; Set the clock as 4 MHz
+
+CLOCK   EQU     4000000
+
+-------- example code --------
+
+
+2) The following constants must be defined (some are optional):
+
+IR_PORT         - Selects the port containing the RXD/TXD bits.  All of the bits
+                  must be in the same port.  (Examples: GPIO, PORTA, PORTB).
+
+IR_TRIS         - Selects the tristate register for the IR_PORT.  (Examples:
+                  TRISIO, TRISA, TRISB).
+
+IR_TXD          - The bit to use for TX data output.  This is the bit number
+                  within the IR_PORT for transmitting data. If this is not
+                  defined then no transmit functions will be available but
+                  receiving will still work.
+
+IR_RXD          - The bit to use for RX data input.  This is the bit number
+                  within the IR_PORT for receiving data.  If this is not
+                  defined then no receive functions will be available but
+                  transmitting will still work.
+
+IR_NBYTES       - The maximum number of bytes that can be received or
+                  transmitted by the functions (maximum of 8).  Setting this
+                  will modify the functions so that this many bytes are used.
+
+-------- example code --------
+
+IR_PORT         EQU  GPIO       ; Required for "ir.inc"
+IR_TRIS         EQU  TRISIO     ; Required for "ir.inc"
+IR_RXD          EQU  5          ; Required for "ir.inc"
+IR_TXD          EQU  4          ; Required for "ir.inc"
+
+-------- example code --------
+
+
+3) A temporary variable called 'ir_temp' must be defined as well as variables to
+   hold the Infra-Red data (data in 'ir_byte1', 'ir_byte2' and up to 'ir_byte8'
+   and the data length 'ir_length') which must all be in the same memory bank as
+   the hardware port defined by IR_PORT.
+
+-------- example code --------
+
+        cblock  0x20
+                ir_temp         ; Required for "ir.inc"
+                ir_length       ; Required for "ir.inc"
+                ir_byte1        ; Required for "ir.inc"
+                ir_byte2        ; Required for "ir.inc"
+                ir_byte3        ; Required for "ir.inc"
+                ir_byte4        ; Required for "ir.inc"
+                ir_byte5        ; Required for "ir.inc"
+                ir_byte6        ; Required for "ir.inc"
+                ir_byte7        ; Required for "ir.inc"
+                ir_byte8        ; Required for "ir.inc"
+        endc
+
+-------- example code --------
+
+
+4) The file "ir.inc" must be included somewhere in the program (I usually put
+   them at the end of the program just before the 'end').  This must come after
+   the definition of all of the constants.
+
+-------- example code --------
+
+        include "ir.inc"
+
+        end
+
+-------- example code --------
+
+
+                    ========================================
+
+Initialisation
+--------------
+
+The Infra-Red port needs to be initialised before it is used.  This is performed
+by calling the initialisation function somewhere in the program before using any
+of the functions.
+
+-------- example code --------
+
+;; Enable Infra-Red port
+
+        call    ir_init_port
+
+-------- example code --------
+
+
+                    ========================================
+
+Data Formats
+------------
+
+The different Infra-Red formats all have their own functions, the names used are
+the standard names where known or the names of the devices that use the format.
+
+RC5 standard
+
+Functions:   ir_rc5_tx_data, ir_rc5_rx_data
+Start pulse: active 890 us
+Zero:        active 890 us, inactive 890 us
+One:         inactive 890 us, active 890 us
+Stop pulse:  none
+Endianness:  MSB first
+
+SIRCS (Sony) format
+
+Functions:   ir_sircs_tx_data, ir_sircs_tx_data
+Start pulse: active 2400 us (92 cycles), inactive 600 us (23 cycles)
+Zero:        active 600 us (23 cycles), inactive 600 us (23 cycles)
+One:         active 1200 us (46 cycles), inactive 600 us (23 cycles)
+Stop pulse:  none
+Endianness:  LSB first
+
+Cable TV format
+
+Functions:   ir_cable_tx_data, ir_cable_rx_data
+Start pulse: active 9282 us (357 cycles), inactive 4342 us (167 cycles)
+Zero:        active 676 us (26 cycles), inactive 2080 us (80 cycles)
+One:         active 676 us (26 cycles), inactive 4342 us (167 cycles)
+Stop pulse:  active 676 us (26 cycles)
+Endianness:  LSB first
+
+Panasonic TV format
+
+Functions:   ir_panasonic_tx_data, ir_panasonic_rx_data
+Start pulse: active 3600 us (138 cycles), inactive 1600 us (62 cycles)
+Zero:        active 420 us (16 cycles), inactive 420 us (16 cycles)
+One:         active 420 us (16 cycles), inactive 1260 us (48 cycles)
+Stop pulse:  active 420 us (16 cycles)
+Endianness:  LSB first
+
+Samsung format
+
+Start pulse: active 4500 us (173 cycles), inactive 4500 us (173 cycles)
+Zero:        active 562 us (21 cycles), inactive 562 us (21 cycles)
+One:         active 562 us (21 cycles), inactive 1687 us (65 cycles)
+Stop pulse:  active 562 us (21 cycles)
+Endianness:  LSB first
+
+NEC format
+
+Start pulse: active 9000 us (346 cycles), inactive 4500 us (173 cycles)
+Zero:        active 562 us (21 cycles), inactive 562 us (21 cycles)
+One:         active 562 us (21 cycles), inactive 1687 us (65 cycles)
+Stop pulse:  active 562 us (21 cycles)
+Endianness:  LSB first
+
+                    ========================================
+
+Transmitting Data
+-----------------
+
+To transmit some data data the value to send must be loaded into the variables
+'ir_byte1', 'ir_byte2' and up to 'ir_byte8', the length of the data loaded into
+the variable 'ir_length' and the transmit function called.  The data must be
+arranged so that the LSBit of ir_byte1 contains the LSBit of the transmit data,
+the LSBit of ir_byte2 contains the 9th transmitted bit etc.
+
+To transmit 13 bits of data with the value 0x1234 in RC5 format the following
+would be used.
+
+-------- example code --------
+
+;; Transmit 13 bits of data in RC5 format
+
+        BANKSEL IR_PORT
+
+        movlw   0x12
+        movwf   ir_byte2
+
+        movlw   0x12
+        movwf   ir_byte1
+
+        movlw   13
+        movwf   ir_length
+
+        call    ir_rc5_tx_data
+
+-------- example code --------
+
+
+                    ========================================
+
+Receiving Data
+--------------
+
+To receive some data data the function must be called for the type of Infra-Red
+format and the data can be read out of the variables.
+
+-------- example code --------
+
+;; Receive data in RC5 format
+
+        call    ir_rc5_rx_data
+
+-------- example code --------
+
+The received data is stored in the eight bytes 'ir_byte1', 'ir_byte2' and up to
+'ir_byte8' and the received data length is stored in 'ir_length'.  The data is
+arranged so that the LSBit of ir_byte1 contains the LSBit of the received data,
+the LSBit of ir_byte2 contains the 9th received bit etc.
+
+
+                    ========================================
+
+References
+----------
+
+http://www.techdesign.be/projects/011/011_waves.htm
+
+http://users.pandora.be/davshomepage/

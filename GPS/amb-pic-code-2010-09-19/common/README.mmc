@@ -1,0 +1,229 @@
+                                MMC/SD Card Functions
+                                =====================
+
+These functions use the SPI functions to read and write to MMC cards and SD
+cards in SPI mode.  The functions implemented are CMD0, CMD1, CMD17 and CMD24
+from the SD card instruction set.  These instructions are to switch to MMC mode,
+initialise the card, read a block (512 bytes) and write a block (512 bytes).
+There are no functions for file systems (probably impossible without at least a
+512 byte RAM buffer) and no support for the High Capacity SD cards (above 2GB).
+
+
+                    ========================================
+
+Prerequisites
+-------------
+
+Before using these functions in your programs the following things must be set
+up.
+
+1) A constant called 'CLOCK' must be defined which is set to the value of the
+   PIC clock (not the instruction cycle clock) measured in Hz.
+
+-------- example code --------
+
+; Set the clock as 4 MHz
+
+CLOCK   EQU     4000000
+
+-------- example code --------
+
+
+2a) The SPI SSP port constants 'SSP_PORT', 'SSP_TRIS', 'SSP_SDI', 'SSP_SDO',
+    'SSP_SS' AND 'SSP_SCK' must be configured, see step 2a of README.spi
+
+2b) The SPI operational parameters must be configured, see step 2b of
+    README.spi.  The correct values for an MMC/SD card for SPI_CKE, SPI_CKP and
+    SPI_SMP are given below.  The value for SPI_RATE_DIV can be 4, 16 or 64, I
+    found that 16 worked well but 4 was unreliable.
+
+-------- example code --------
+
+SPI_CKE         EQU  1          ; Required for "spi.inc"
+SPI_CKP         EQU  0          ; Required for "spi.inc"
+SPI_SMP         EQU  1          ; Required for "spi.inc"
+SPI_RATE_DIV    EQU  16         ; Required for "spi.inc"
+
+-------- example code --------
+
+
+3a) The SPI temporary variable 'spi_temp' must be defined, see step 3 of
+    README.spi
+
+3b) The variables called 'mmc_temp', 'mmc_addr0', 'mmc_addr1', 'mmc_addr2' must
+    be defined which are all in the same memory bank as the SSP memory location
+    SSPBUF.
+
+-------- example code --------
+
+        cblock  0x20
+                mmc_temp        ; Required for "mmc.inc"
+                mmc_addr_0      ; Required for "mmc.inc"
+                mmc_addr_1      ; Required for "mmc.inc"
+                mmc_addr_2      ; Required for "mmc.inc"
+        endc
+
+-------- example code --------
+
+
+4a) The file "spi.inc"must be included in the program, see step 4 of README.spi.
+
+4b) The file "mmc.inc" must be included somewhere in the program (I usually put
+    them at the end of the program just before the 'end').  This must come after
+    the definition of all of the constants.
+
+-------- example code --------
+
+        include "mmc.inc"
+
+        end
+
+-------- example code --------
+
+
+                    ========================================
+
+Initialisation
+--------------
+
+The initialisation required for the hardware is just the initialisation for the
+SPI functions described in README.spi.
+
+The initialisation of an SD/MMC card when inserted must occur after the port has
+been initialised.  This function will call the CMD0 and CMD1 commands defined in
+the SD card specification (see reference documents at the end of this file).
+
+-------- example code --------
+
+;; Enable SPI port
+
+        call    spi_init_master_port
+
+;; Initialise MMC/SD card
+
+        call    mmc_init
+
+-------- example code --------
+
+The return value of mmc_init (in register W) is zero if it was OK or something
+else in case of an error.
+
+
+                    ========================================
+
+Read Block
+----------
+
+The read function operates on blocks although the SD card specification allows
+for reading the card not aligned by block boundaries in some cases.  There are
+three parts to the read; start the read with the specified address, read 512
+bytes of data, stop the read.
+
+The function to start the read is called 'mmc_read_start' and the three address
+byte variables must be set before this is called.  The address is 32 bits long
+and byte 'mmc_addr0' is the MSByte, 'mmc_addr1' is next, 'mmc_addr2' is the
+third byte and the fourth byte is always zero.
+
+To read the bytes within the block the SPI functions are used, in this case only
+the received byte is useful.  In the example below 'spi_dummy_wait_rx_byte' is
+used although other options are possible.  After calling the function the result
+is in the register W.
+
+To terminate the read of the block the function 'mmc_read_end' is called.
+
+-------- example code --------
+
+        BANKSEL SSPBUF          ; Select RAM bank
+
+;; Read first block from SD card
+
+        clrf    mmc_addr_0
+        clrf    mmc_addr_1
+        clrf    mmc_addr_2
+
+        call    mmc_read_start
+
+;; Read data from card
+
+        clrf    counter         ; Count to 256, 2 bytes per loop
+
+read_block_loop
+        call    spi_dummy_wait_rx_byte
+
+        ; byte is in register W
+
+        call    spi_dummy_wait_rx_byte
+
+        ; byte is in register W
+
+        decfsz  counter,F
+        goto    read_block_loop
+
+;; End the read
+
+        call    mmc_read_end
+
+-------- example code --------
+
+
+                    ========================================
+
+Write Block
+-----------
+
+The write function operates on blocks which is all that the SD card
+specification allows.  There are three parts to the write; start the write with
+the specified address, write 512 bytes of data, stop the write.
+
+The function to start the write is called 'mmc_write_start' and the three
+address byte variables must be set before this is called.  The address bytes are
+just the same as the read block command above.
+
+To write the bytes within the block the SPI functions are used, in this case
+only the transmitted byte is useful.  In the example 'spi_tx_wait_discard_byte'
+is used although other options are possible.  Before calling the function the
+byte to be written must be in the register W.
+
+To terminate the write of the block the function 'mmc_write_end' is called.
+
+-------- example code --------
+
+        BANKSEL SSPBUF          ; Select RAM bank
+
+;; Write first block from SD card
+
+        clrf    mmc_addr_0
+        clrf    mmc_addr_1
+        clrf    mmc_addr_2
+
+        call    mmc_write_start
+
+;; Write data from card
+
+        clrf    counter         ; Count to 256, 2 bytes per loop
+
+write_block_loop
+        call    spi_tx_wait_discard_byte
+
+        ; byte is in register W
+
+        call    spi_tx_wait_discard_byte
+
+        ; byte is in register W
+
+        decfsz  counter,F
+        goto    write_block_loop
+
+;; End the write
+
+        call    mmc_write_end
+
+-------- example code --------
+
+
+                    ========================================
+
+References
+----------
+
+http://www.sdcard.org/sd_memorycard/Simplified%20Physical%20Layer%20Specification.PDF

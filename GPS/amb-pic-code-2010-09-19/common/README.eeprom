@@ -1,0 +1,94 @@
+                                EEPROM Functions
+                                ================
+
+This set of functions allow reading and writing to the EEPROM within the PIC
+device.  They take care of the different methods which need to be used for the
+different PIC device types.
+
+Currently these functions have been confirmed for the 16F675 and 16F819 devices.
+
+
+                    ========================================
+
+Prerequisites
+-------------
+
+Before using these functions in your programs the following things must be set
+up.
+
+
+1) A variable called 'eeprom_temp' must be defined which is in the same memory
+   bank as the EECON1 register.
+
+-------- example code --------
+
+        cblock  0x20
+                eeprom_temp     ; Required for "eeprom.inc"
+        endc
+
+-------- example code --------
+
+
+2) The file "eeprom.inc" must be included somewhere in the program (I usually
+   put them at the end of the program just before the 'end').  This must come
+   after the definition of all of the constants.
+
+-------- example code --------
+
+        include "eeprom.inc"
+
+        end
+
+-------- example code --------
+
+
+                    ========================================
+
+Reading EEPROM
+--------------
+
+To read from the EEPROM the address needs to be loaded into 'w' when the
+function is called and the contents of the EEPROM will be contained in 'w' when
+the function returns.
+
+-------- example code --------
+
+;; Read the contents of address 0 in EEPROM
+
+        movlw   0               ; Select address 0.
+
+        call    eeprom_read
+
+-------- example code --------
+
+
+                    ========================================
+
+Writing EEPROM
+--------------
+
+To write to the EEPROM the address needs to be loaded into 'w' and the data to
+be written loaded into 'EEDATA' when the function is called.
+
+-------- example code --------
+
+;; Write the value 0xff to the address 0 in EEPROM
+
+        BANKSEL EEDATA          ; Select RAM bank
+
+        movlw   0xff
+        movwf   EEDATA          ; Set data to write
+
+        movlw   0               ; Select address 0.
+
+        call    eeprom_read
+
+-------- example code --------
+
+
+                    ========================================
+
+References
+----------
+
+Microchip PIC device programming information.

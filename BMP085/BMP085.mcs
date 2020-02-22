@@ -1,0 +1,58 @@
+[Header]
+MagicCookie={0b13fe8c-dfe0-40eb-8900-6712719559a7}
+Version=1.0
+[File000]
+Location=C:\Projects\mpasm\BMP085\bmp085.o
+Folder=Intermediary
+DeviceName=PIC16F88
+LanguageToolSuiteID={6B3DAA78-59C1-46DD-B6AA-DBDAE4E06484}
+LanguageToolID={49D3CA3F-D9A3-4518-9943-226A347E8CC7}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\MPASM Suite\MPASMWIN.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
+SOLK=<src>|bmp085.asm||<obj>||<lib>||<lkr>||
+SuiteArgsString=build-library generic-device
+ToolArgsString=
+TraceCmdString=
+DebugOptions=
+[File001]
+Location=C:\Projects\mpasm\BMP085\bmp085.err
+Folder=Intermediary
+DeviceName=PIC16F88
+LanguageToolSuiteID={6B3DAA78-59C1-46DD-B6AA-DBDAE4E06484}
+LanguageToolID={49D3CA3F-D9A3-4518-9943-226A347E8CC7}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\MPASM Suite\MPASMWIN.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
+SOLK=<src>|bmp085.asm||<obj>||<lib>||<lkr>||
+SuiteArgsString=build-library generic-device
+ToolArgsString=
+TraceCmdString=
+DebugOptions=
+[File002]
+Location=C:\Projects\mpasm\BMP085\bmp085.lst
+Folder=Output
+DeviceName=PIC16F88
+LanguageToolSuiteID={6B3DAA78-59C1-46DD-B6AA-DBDAE4E06484}
+LanguageToolID={49D3CA3F-D9A3-4518-9943-226A347E8CC7}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\MPASM Suite\MPASMWIN.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
+SOLK=<src>|bmp085.asm||<obj>||<lib>||<lkr>||
+SuiteArgsString=build-library generic-device
+ToolArgsString=
+TraceCmdString=
+DebugOptions=
+[File003]
+Location=C:\Projects\mpasm\BMP085\BMP085.lib
+Folder=Output
+DeviceName=PIC16F88
+LanguageToolSuiteID={6B3DAA78-59C1-46DD-B6AA-DBDAE4E06484}
+LanguageToolID={8DF337E3-D4EF-4566-8F67-3798A3412C47}
+LanguageToolLocation=C:\Program Files (x86)\Microchip\MPASM Suite\mplib.exe
+PPAD=$(BINDIR)||$(TMPDIR)||$(AINDIR)||$(INCDIR)||$(LIBDIR)||$(LKRDIR)||
+SOLK=<src>|bmp085.asm||<obj>||<lib>||<lkr>||
+SuiteArgsString=build-library generic-device
+ToolArgsString=
+TraceCmdString=
+DebugOptions=
+[TOOL_LOC_STAMPS]
+tool_loc{49D3CA3F-D9A3-4518-9943-226A347E8CC7}=C:\Program Files (x86)\Microchip\MPASM Suite\MPASMWIN.exe
+tool_loc{8DF337E3-D4EF-4566-8F67-3798A3412C47}=C:\Program Files (x86)\Microchip\MPASM Suite\mplib.exe

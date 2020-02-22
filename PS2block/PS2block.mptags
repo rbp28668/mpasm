@@ -1,0 +1,30 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.5.4	//
+!_TAG_REVISION_NAME	MCHPTags	//
+!_TAG_REVISION_VERSION	6.0.1	//
+ALMOST_EMPTY	C:\Projects\mplab\PS2block\PS2block.asm	17;"	q	line:17
+DEBUG_LED	C:\Projects\mplab\PS2block\PS2block.asm	20;"	q	line:20
+DELAY	C:\Projects\mplab\PS2block\PS2block.asm	47;"	l	line:47
+Debug	C:\Projects\mplab\PS2block\PS2block.asm	98;"	l	line:98
+HEART_DISP	C:\Projects\mplab\PS2block\PS2block.asm	14;"	q	line:14
+HeartBeat	C:\Projects\mplab\PS2block\PS2block.asm	57;"	l	line:57
+IncCharge	C:\Projects\mplab\PS2block\PS2block.asm	77;"	l	line:77
+Loop	C:\Projects\mplab\PS2block\PS2block.asm	150;"	l	line:150
+RELAY	C:\Projects\mplab\PS2block\PS2block.asm	18;"	q	line:18
+RESET	C:\Projects\mplab\PS2block\PS2block.asm	110;"	l	line:110
+STATE_DISP0	C:\Projects\mplab\PS2block\PS2block.asm	15;"	q	line:15
+STATE_DISP1	C:\Projects\mplab\PS2block\PS2block.asm	16;"	q	line:16
+SW1	C:\Projects\mplab\PS2block\PS2block.asm	9;"	q	line:9
+SW2	C:\Projects\mplab\PS2block\PS2block.asm	10;"	q	line:10
+StateCharging	C:\Projects\mplab\PS2block\PS2block.asm	210;"	l	line:210
+StateEmpty	C:\Projects\mplab\PS2block\PS2block.asm	188;"	l	line:188
+StateFull	C:\Projects\mplab\PS2block\PS2block.asm	293;"	l	line:293
+StateRun	C:\Projects\mplab\PS2block\PS2block.asm	245;"	l	line:245
+debug1	C:\Projects\mplab\PS2block\PS2block.asm	102;"	l	line:102
+debug2	C:\Projects\mplab\PS2block\PS2block.asm	103;"	l	line:103
+heart1	C:\Projects\mplab\PS2block\PS2block.asm	70;"	l	line:70
+heart2	C:\Projects\mplab\PS2block\PS2block.asm	71;"	l	line:71
